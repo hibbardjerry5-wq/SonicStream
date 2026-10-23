@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer Audio Equalizer Bars / Soundwave -->
+    <!-- Bar 1 (Leftmost) -->
+    <path
+        android:pathData="M34,46 L34,62"
+        android:strokeWidth="3.5"
+        android:strokeColor="#38BDF8"
+        android:strokeLineCap="round" />
+        
+    <!-- Bar 2 -->
+    <path
+        android:pathData="M41,38 L41,70"
+        android:strokeWidth="3.5"
+        android:strokeColor="#00E5FF"
+        android:strokeLineCap="round" />
+
+    <!-- Bar 3 (Center-Left) -->
+    <path
+        android:pathData="M48,30 L48,78"
+        android:strokeWidth="3.5"
+        android:strokeColor="#818CF8"
+        android:strokeLineCap="round" />
+
+    <!-- Center Play/Note Symbol / Peak Bar -->
+    <path
+        android:pathData="M54,24 L54,84"
+        android:strokeWidth="4.2"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:startX="54"
+                android:startY="24"
+                android:endX="54"
+                android:endY="84"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#00E5FF" />
+                <item android:offset="0.5" android:color="#A855F7" />
+                <item android:offset="1.0" android:color="#EC4899" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Bar 5 (Center-Right) -->
+    <path
+        android:pathData="M60,32 L60,76"
+        android:strokeWidth="3.5"
+        android:strokeColor="#C084FC"
+        android:strokeLineCap="round" />
+
+    <!-- Bar 6 -->
+    <path
+        android:pathData="M67,40 L67,68"
+        android:strokeWidth="3.5"
+        android:strokeColor="#F43F5E"
+        android:strokeLineCap="round" />
+
+    <!-- Bar 7 (Rightmost) -->
+    <path
+        android:pathData="M74,48 L74,60"
+        android:strokeWidth="3.5"
+        android:strokeColor="#FB7185"
+        android:strokeLineCap="round" />
+
+    <!-- Floating high-frequency dots -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M41,31 A2,2 0 1,1 41,35 A2,2 0 1,1 41,31" />
+    <path
+        android:fillColor="#C084FC"
+        android:pathData="M54,17 A2.2,2.2 0 1,1 54,21.4 A2.2,2.2 0 1,1 54,17" />
+    <path
+        android:fillColor="#FB7185"
+        android:pathData="M67,33 A2,2 0 1,1 67,37 A2,2 0 1,1 67,33" />
+</vector>

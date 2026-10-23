@@ -1,0 +1,122 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidPlaylist(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             (!('description' in data) || data.description == null || (data.description is string && data.description.size() <= 500)) &&
+             (!('colorHex' in data) || data.colorHex == null || (data.colorHex is string && data.colorHex.size() <= 20)) &&
+             data.trackIds is list && data.trackIds.size() <= 500 &&
+             (data.trackIds.size() == 0 || data.trackIds[0] is string) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidUserSettings(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.equalizerBands is list && data.equalizerBands.size() <= 10 &&
+             (data.equalizerBands.size() == 0 || data.equalizerBands[0] is int) &&
+             data.bassBoost is int && data.bassBoost >= 0 && data.bassBoost <= 1000 &&
+             data.virtualizer is int && data.virtualizer >= 0 && data.virtualizer <= 1000 &&
+             (!('reverbPreset' in data) || (data.reverbPreset is string && data.reverbPreset.size() <= 50)) &&
+             data.activePreset is string && data.activePreset.size() <= 50 &&
+             (!('themeAccent' in data) || (data.themeAccent is string && data.themeAccent.size() <= 50)) &&
+             data.visualizerMode is string && data.visualizerMode.size() <= 50 &&
+             (!('volumeNormalization' in data) || data.volumeNormalization is bool) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidTrackItem(data) {
+      return data.userId is string && data.userId.size() <= 128 &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.artist is string && data.artist.size() >= 1 && data.artist.size() <= 200 &&
+             (!('album' in data) || data.album == null || (data.album is string && data.album.size() <= 200)) &&
+             (!('duration' in data) || data.duration is int) &&
+             data.isFavorite is bool &&
+             data.playCount is int && data.playCount >= 0 &&
+             (!('lastPlayedAt' in data) || data.lastPlayedAt == null || (data.lastPlayedAt is timestamp && data.lastPlayedAt <= request.time)) &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    match /users/{userId} {
+      allow read, write: if false;
+
+      match /playlists/{playlistId} {
+        allow get: if isOwner(userId) && isValidId(playlistId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(playlistId) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'name', 'trackIds', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'name', 'description', 'colorHex', 'trackIds', 'createdAt', 'updatedAt']) &&
+                         isValidPlaylist(incoming());
+        allow update: if isOwner(userId) && isValidId(playlistId) &&
+                         incoming().userId == userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidPlaylist(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['name', 'description', 'colorHex', 'trackIds', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(playlistId);
+      }
+
+      match /user_settings/{settingsId} {
+        allow get: if isOwner(userId) && isValidId(settingsId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(settingsId) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'equalizerBands', 'bassBoost', 'virtualizer', 'activePreset', 'visualizerMode', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'equalizerBands', 'bassBoost', 'virtualizer', 'reverbPreset', 'activePreset', 'themeAccent', 'visualizerMode', 'volumeNormalization', 'createdAt', 'updatedAt']) &&
+                         isValidUserSettings(incoming());
+        allow update: if isOwner(userId) && isValidId(settingsId) &&
+                         incoming().userId == userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidUserSettings(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['equalizerBands', 'bassBoost', 'virtualizer', 'reverbPreset', 'activePreset', 'themeAccent', 'visualizerMode', 'volumeNormalization', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(settingsId);
+      }
+
+      match /library_tracks/{trackId} {
+        allow get: if isOwner(userId) && isValidId(trackId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(trackId) &&
+                         incoming().userId == userId &&
+                         incoming().keys().hasAll(['userId', 'title', 'artist', 'isFavorite', 'playCount', 'createdAt', 'updatedAt']) &&
+                         incoming().keys().hasOnly(['userId', 'title', 'artist', 'album', 'duration', 'isFavorite', 'playCount', 'lastPlayedAt', 'createdAt', 'updatedAt']) &&
+                         isValidTrackItem(incoming());
+        allow update: if isOwner(userId) && isValidId(trackId) &&
+                         incoming().userId == userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         isValidTrackItem(incoming()) &&
+                         incoming().diff(existing()).affectedKeys().hasOnly(['title', 'artist', 'album', 'duration', 'isFavorite', 'playCount', 'lastPlayedAt', 'updatedAt']);
+        allow delete: if isOwner(userId) && isValidId(trackId);
+      }
+    }
+  }
+}

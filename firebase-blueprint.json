@@ -1,0 +1,167 @@
+{
+  "entities": {
+    "Playlist": {
+      "title": "Playlist",
+      "description": "User custom or smart playlist containing track references and metadata",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user who owns the playlist"
+        },
+        "name": {
+          "type": "string",
+          "description": "Display name of the playlist"
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of the playlist"
+        },
+        "colorHex": {
+          "type": "string",
+          "description": "Hex color code for playlist card theming"
+        },
+        "trackIds": {
+          "type": "array",
+          "description": "Ordered array of track identifiers in this playlist"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when playlist was created. Write with FieldValue.serverTimestamp()"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when playlist was last updated. Write with FieldValue.serverTimestamp()"
+        }
+      },
+      "required": ["userId", "name", "trackIds", "createdAt", "updatedAt"]
+    },
+    "UserSettings": {
+      "title": "UserSettings",
+      "description": "User preferences including 5-band equalizer gains, DSP effects, visualizer and theme settings",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user"
+        },
+        "equalizerBands": {
+          "type": "array",
+          "description": "5-band equalizer gain levels in millibels or dB levels (-10 to 10 dB)"
+        },
+        "bassBoost": {
+          "type": "integer",
+          "description": "Bass boost strength from 0 to 1000"
+        },
+        "virtualizer": {
+          "type": "integer",
+          "description": "3D virtualizer effect strength from 0 to 1000"
+        },
+        "reverbPreset": {
+          "type": "string",
+          "description": "Selected reverb preset name"
+        },
+        "activePreset": {
+          "type": "string",
+          "description": "Active sound preset (e.g. Flat, Bass Boost, Vocal, Electronic, Rock)"
+        },
+        "themeAccent": {
+          "type": "string",
+          "description": "Interface accent theme name"
+        },
+        "visualizerMode": {
+          "type": "string",
+          "description": "Selected visualizer visual style"
+        },
+        "volumeNormalization": {
+          "type": "boolean",
+          "description": "Whether audio volume normalization is enabled"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when settings document was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when settings document was last updated"
+        }
+      },
+      "required": ["userId", "equalizerBands", "bassBoost", "virtualizer", "activePreset", "visualizerMode", "createdAt", "updatedAt"]
+    },
+    "TrackItem": {
+      "title": "TrackItem",
+      "description": "Cloud synced track metadata, play stats, and favorite flag",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The UID of the user owning this library track state"
+        },
+        "title": {
+          "type": "string",
+          "description": "Song title"
+        },
+        "artist": {
+          "type": "string",
+          "description": "Song artist"
+        },
+        "album": {
+          "type": "string",
+          "description": "Song album"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "Track duration in milliseconds"
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "description": "Whether the track is marked as favorite"
+        },
+        "playCount": {
+          "type": "integer",
+          "description": "Number of times this track has been played"
+        },
+        "lastPlayedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when track was last played"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when track was added to library"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when track record was last updated"
+        }
+      },
+      "required": ["userId", "title", "artist", "isFavorite", "playCount", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/playlists/{playlistId}": {
+      "schema": {
+        "$ref": "#/entities/Playlist"
+      },
+      "description": "Playlists created and curated by the authenticated user"
+    },
+    "/users/{userId}/user_settings/{settingsId}": {
+      "schema": {
+        "$ref": "#/entities/UserSettings"
+      },
+      "description": "Sound customizations, EQ profile, and interface theme per user"
+    },
+    "/users/{userId}/library_tracks/{trackId}": {
+      "schema": {
+        "$ref": "#/entities/TrackItem"
+      },
+      "description": "User library songs, favorites, and play counters"
+    }
+  }
+}

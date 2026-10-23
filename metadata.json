@@ -1,0 +1,6 @@
+{
+  "name": "Resonance",
+  "description": "High-fidelity music player featuring an equalizer, offline playlists, cloud library sync, and full-screen HD visualizer.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
